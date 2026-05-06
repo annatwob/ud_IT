@@ -1,0 +1,47 @@
+Download AlmaLinux9.7 
+Múlt órai anyag újra mutatása
+Putty
+Student 
+Student
+a
+echo Hello
+Echo hello > message
+Ls
+Ls -l
+Ls- li
+Ls -li message
+Cat message
+Id
+Stat message
+Ls -li
+Ls -lia
+Chmod g-r message
+Chmod go+x messag
+Chmod u=rx message
+Ls -li message
+Chmod u=rw,go=r message
+Ls -li message
+Echo 111111111>message
+Ls -li messege
+Chmod 241>messege
+Ls -li messege
+Echo Hello>messege
+Stat messege
+Ls -li /etc/shadow
+Shadow_t:s0
+
+Clear
+
+Date 
+Type date
+Which date
+Echo $PATH
+Stat /usr/bin/date
+Cp /usr/bin/date datum
+Ls -ali
+Chmod 100 datum
+Ls -ali
+File datum
+Clear
+
+GATYA

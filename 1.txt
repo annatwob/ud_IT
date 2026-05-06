@@ -1,0 +1,29 @@
+Ocarcle virtual box. Org
+AlmaLinux9.7
+
+exam.progcont.eu
+
+Tab billentyu automatikus kiegeszites
+
+Boot menuben e 
+rd.break linux sorba utana ctrl x
+Ls
+Ls sysroot/
+Mount-utcso sor a lényeg 
+Mount -o remount.rw /sysroot
+Mount
+Cat /sysroot/etc/shadow
+Chroot /sysroot/
+Ls /
+Ls /sysroot/
+Chroot /sysroot/
+Ls/
+Cat /etc/shadow
+Passwd
+a
+a
+Ls -lZ /etc/shadow*
+Touch /.autorelabel
+Exit
+Exit
+                http://exam.progcont.eu

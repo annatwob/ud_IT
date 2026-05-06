@@ -1,0 +1,52 @@
+Su Student
+Student
+
+Putty
+Student 
+Student
+Mkdir folder1
+Echo hello > folder1/message
+Tree
+Ls -ali folder1/message
+Ls -ali folder1
+Ls -alid /home/student
+Ls -ali /home/student
+Ls -alid /home
+Ls -ali /home
+Cat folder1/message
+->hello
+
+El vettuk a jogokat ig
+
+Chmod 000 folder1/
+Ls -alid folder1/
+Ls -a folder1/
+Cat folder1/message
+Cd folder1/
+Chmod u+r folder1/
+Ls -alid folder1/
+Ls -a folder1/
+Cat folder1/message
+Cd folder1/
+Chmod u=x folder1/
+Ls -a folder1/
+Ls -alid folder1/
+Ls -a folder1/
+Cat folder1/message
+Cd folder1/
+Cd ..
+
+Masik putty nyitas duplicate cuccli
+Student 
+Student 
+Su
+A
+Exit
+Sudo bash
+Student
+Pwd
+Mkdir folder2
+Ls -alid folder2/
+Echo hello > folder2/valami
+Mv folder2/ valami folder2/masvalami
+Ls -ali folder2/
