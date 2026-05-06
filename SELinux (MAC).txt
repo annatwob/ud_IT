@@ -1,0 +1,44 @@
+Az SELinux (Security-Enhanced Linux) a biztonság "utolsó védvonala". Míg a DAC (ACL) a felhasználó döntésére bízta a jogokat, a MAC (SELinux) egy központi, szigorú szabályrendszert kényszerít ki, amit még a fájl tulajdonosa sem módosíthat.
+
+🛡️ DAC vs. MAC: Mi a különbség?
+
+Jellemző		DAC (Hagyományos/ACL)			MAC (SELinux)
+Teljes név		Discretionary Access Control		Mandatory Access Control
+Döntéshozó		Az objektum tulajdonosa			A rendszer központi házirendje
+Alapelv			"A tulajdonos engedélyt ad"		"A rendszer kényszeríti ki a szabályt"
+Felülbírálás		A tulajdonos bárkinek adhat jogot	A SELinux felülbírálja az ACL-t!
+
+Vizsga-szempont: Ha egy fájlra adsz 777 (mindenkinek rwx) jogot az ACL-ben, de a SELinux címkéje nem engedi a folyamatnak a hozzáférést, a művelet meg lesz tagadva. A biztonsági rétegek egymásra épülnek.
+
+Kontextus Címkék (Context Labels)
+Minden folyamat (process) és minden állomány rendelkezik egy címkével. A hozzáférés csak akkor engedélyezett, ha a folyamat címkéje és a fájl címkéje között a házirendben van egy engedélyező szabály.
+
+Hogyan kap címkét egy fájl?
+Elérési út alapján: A file_context konfiguráció meghatározza (reguláris kifejezésekkel), hogy melyik útvonalon milyen címke jár (pl. a /var/www/html/ tartalma httpd_sys_content_t lesz).
+
+Öröklődés: Ha nincs minta, az új fájl a tartalmazó könyvtár címkéjét örökli.
+
+Másolás vs. Mozgatás (KRITIKUS HIBAPONT):
+
+Másolás (cp): Az új helyen a célkönyvtárnak megfelelő új címkét kapja.
+
+Mozgatás (mv): A fájl viszi magával a régi címkéjét. Ez gyakran okoz hibát (pl. a /home-ból átmozgatott fájlt a webserver nem tudja beolvasni, mert a címkéje "user_home_t" maradt).
+
+1. Ellenőrzés
+A -Z kapcsoló szinte minden alapvető parancsnál megjeleníti a SELinux címkéket:
+
+ls -Z: Fájlok kontextusának lekérdezése.
+
+ps -Z: Folyamatok kontextusának lekérdezése.
+
+id -Z: Az aktuális felhasználó kontextusa.
+
+2. Módosítás és Helyreállítás
+chcon (Change Context): Átmeneti, kézi módosítás (pl. chcon -t httpd_sys_content_t index.html). Figyelem: Újracímkézéskor vagy restorecon után ez elveszik!
+
+restorecon: Visszaállítja az állomány címkéjét a rendszer alapértelmezett (file_context) szabályai szerint. (pl. restorecon -v fajl).
+
+3. Állapot kezelése
+getenforce: Lekérdezi az aktuális módot (Enforcing, Permissive, Disabled).
+
+setenforce 0/1: Átváltás Permissive (0 - csak naplóz, de enged) és Enforcing (1 - blokkolja a tiltott műveletet) módok között.

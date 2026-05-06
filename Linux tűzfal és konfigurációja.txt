@@ -1,0 +1,38 @@
+Ez a fejezet a Linuxos tűzfalak hierarchiáját és a firewalld gyakorlati működését foglalja össze. Vizsga szempontjából a legfontosabb megérteni, hogy a különböző eszközök (Netfilter, nftables, firewalld) hogyan épülnek egymásra.
+
+🏗️ A Linux tűzfal architektúrája
+A Linux tűzfal nem egyetlen program, hanem több réteg együttműködése:
+
+Netfilter (Kernel szint): Ez a tényleges "motor", ami a Linux magjában (kernel) fut. Ez végzi a csomagok vizsgálatát és szűrését (stateful módon).
+
+nftables / iptables (Alacsony szintű eszközök): Ezekkel a parancsokkal lehet közvetlenül utasítani a Netfiltert. Az iptables a régi szabvány, az nftables az új (ezt az nft paranccsal kezeljük).
+
+firewalld / ufw (Magas szintű absztrakció): Ezek kényelmi eszközök ("frontendek"). Nem ők szűrnek, hanem emberi nyelven megfogalmazott szabályokat (pl. "engedélyezd a HTTP-t") fordítanak le nftables szabályokra.
+
+🛡️ A firewalld alapfogalmai
+A RedHat alapú rendszereken a firewalld a szabvány. Két kulcsfontosságú koncepciót használ:
+
+1. Zónák (Zones)
+A zónák határozzák meg, mennyire bízunk egy adott hálózatban. Minden hálózati kártya (interfész) egy zónához tartozik.
+
+public: Alapértelmezett, nem bízunk a többiekben (csak a legszükségesebb portok nyitottak).
+
+trusted: Teljes bizalom, minden forgalom engedélyezett.
+
+drop: Minden bejövő csomagot válasz nélkül eldob.
+
+2. Runtime vs. Permanent beállítások
+Ez a leggyakoribb hibaforrás:
+
+Runtime (Aktuális): Azonnal életbe lép, de újraindítás után elveszik. Jó tesztelésre.
+
+Permanent (Mentett): Újraindítás után is megmarad, de a beállítás után újra kell tölteni a tűzfalat, hogy aktív legyen.
+
+🛠️ Fontosabb firewalld parancsok (Puska)
+Parancs						Leírás
+firewall-cmd --get-active-zones			Megmutatja, melyik kártya melyik zónában van.
+firewall-cmd --list-all				Kilistázza az aktuális zóna összes szabályát (nyitott portok, szolgáltatások).
+firewall-cmd --add-service=http			HTTP engedélyezése (ideiglenesen).
+firewall-cmd --add-port=8080/tcp --permanent	Port 8080 végleges megnyitása.
+firewall-cmd --reload				A permanens szabályok aktiválása (runtime-ba töltése).
+firewall-cmd --panic-on				Pánik mód: Minden ki- és bejövő forgalom azonnali tiltása.

@@ -1,0 +1,38 @@
+🔑 Szimmetrikus titkosítás: AES (Advanced Encryption Standard)
+A szimmetrikus titkosítás lényege, hogy ugyanaz a kulcs kell a titkosításhoz és a visszafejtéshez is.
+
+1. Kulcshossz
+Az algoritmus neve (pl. aes-128, aes-256) a kulcs méretét jelzi bitben. Minél nagyobb ez a szám, annál nehezebb "nyers erővel" (brute force) feltörni a titkosítást. Az AES mindig 16 bájtos blokkokkal dolgozik, függetlenül a kulcs hosszától.
+
+🔄 Blokkmódok (ECB vs. CBC)
+Nem mindegy, hogyan láncoljuk össze a fájl darabjait (blokkjait) a titkosítás során.
+
+ECB (Electronic Code Book)
+Működése: Minden blokkot teljesen függetlenül titkosít.
+
+Hiba: Ha két blokk tartalma azonos, a titkosított eredményük is azonos lesz. Ez mintázatokat hagy az adatokban (pl. egy kép körvonalai felismerhetőek maradnak titkosítás után is). Biztonsági szempontból nem ajánlott.
+
+CBC (Cipher Block Chaining)
+Működése: Minden blokk titkosítása függ az előző blokk eredményétől. Így az egymást követő azonos adatok is teljesen különböző titkosított szöveget eredményeznek.
+
+IV (Inicializáló Vektor): Mivel az első blokknak nincs előzője, egy véletlenszerű IV-vel kezdjük a folyamatot. A visszafejtéshez a Kulcs + IV párosra van szükség.
+
+🧂 Jelszó, Kulcsgenerálás és a Só (Salt)
+A felhasználók általában jelszót adnak meg, nem pedig 256 bites hexadecimális kulcsokat.
+
+Kulcsszármaztatás: Az OpenSSL a jelszóból egy algoritmus segítségével generálja le a tényleges kulcsot és az IV-t.
+
+A Só (Salt) szerepe: Ha ugyanazt a fájlt kétszer titkosítod ugyanazzal a jelszóval, a só nélkül az eredmény azonos lenne. A só egy véletlen bitsorozat, amit a jelszóhoz kevernek a kulcsgenerálás előtt.
+
+Eredmény: Még ha a jelszó ugyanaz is, minden titkosítás egyedi kulcsot és IV-t kap a véletlen só miatt.
+
+Tárolás: Az OpenSSL a sót a titkosított fájl elején (fejlécében) tárolja, így visszafejtéskor a jelszó megadása után a rendszer ki tudja olvasni és le tudja gyártani a szükséges kulcsot.
+
+🛠️ OpenSSL parancsok (Puska)
+
+Feladat				Parancs
+Titkosítás (AES-256-CBC)	openssl enc -aes-256-cbc -salt -in adat.txt -out adat.enc
+Visszafejtés			openssl enc -aes-256-cbc -d -in adat.enc -out adat.vissza
+Lista az algoritmusokról	openssl enc -list
+
+A -d kapcsoló jelenti a decrypt (visszafejtés) műveletet.

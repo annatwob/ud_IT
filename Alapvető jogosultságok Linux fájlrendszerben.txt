@@ -1,0 +1,52 @@
+Rövidítés	Név	Leírás
+u	User (Owner)	Az állomány egyetlen, nevesített tulajdonosa.
+g	Group		Az állományhoz rendelt tulajdonos csoport tagjai.
+o	Other		Mindenki más, aki nem tulajdonos és nem csoporttag.
+
+1. ls -l vagy stat
+A jogosultságok ellenőrzésére szolgál.
+
+Kimenet formátuma: -rwxr-xr--
+
+karakter: Típus (- fájl, d könyvtár)
+
+2-4. karakter: Tulajdonos jogai (u)
+
+5-7. karakter: Csoport jogai (g)
+
+8-10. karakter: Mindenki más (o)
+
+2. chmod (Change Mode)
+Jogosultságok módosítása. Kétféleképpen használható:
+
+Oktális (számokkal): chmod 755 fajlnev
+
+7 (r+w+x = 4+2+1) -> Tulajdonos mindent ér
+
+5 (r+x = 4+1) -> Csoport és Others olvashat/beléphet
+
+Szimbolikus (betűkkel):
+
+chmod u+x fajl (Tulajdonosnak futtatási jogot ad)
+
+chmod go-w fajl (Csoporttól és másoktól elveszi az írási jogot)
+
+3. chown (Change Owner)
+Az állomány tulajdonosának (és csoportjának) átírása. Csak root (rendszergazda) futtathatja!
+
+Példa: chown user:group fajlnev
+
+4. id
+Lekérdezi az aktuális felhasználó azonosítóit:
+
+UID (User ID)
+
+GID (Effective Group ID)
+
+Groups (Milyen csoportoknak tagja még)
+
+Döntési algoritmus: A rendszer nem adja össze a jogokat. Ha te vagy a tulajdonos, a rendszer csak a tulajdonos bitjeit nézi meg. Ha ott nincs jogod, de a csoportodnak lenne, akkor is meg lesz tagadva a hozzáférés!
+
+Szkriptek futtatása: Egy shell script futtatásához kell az r (olvasás) és az x (futtatás) is, mert az interpreternek (pl. /bin/bash) el kell tudnia olvasni a szöveget, amit futtat.
+
+Root kivétel: A rendszergazdára nem vonatkoznak ezek a korlátozások, ő mindent lát és módosíthat

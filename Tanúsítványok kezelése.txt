@@ -1,0 +1,45 @@
+📜 Mi az a tanúsítvány?
+A tanúsítvány egy digitális "személyi igazolvány" a nyilvános kulcshoz.
+
+Tartalma: A tulajdonos neve, a nyilvános kulcsa, a kiállító adatai, érvényességi idő és a kiállító digitális aláírása.
+
+Hitelesítés: A tanúsítványt egy bizalmi harmadik fél, a CA (Certificate Authority – Hitelesítő Hatóság) írja alá.
+
+🔗 Tanúsítványlánc és Bizalmi hierarchia
+A hitelesség ellenőrzése nem egy lépésből áll, hanem egy láncon halad végig:
+
+Végponti tanúsítvány: Amit ellenőrizni akarunk (pl. egy weboldalé).
+
+Köztes (Intermediate) tanúsítvány: A CA tanúsítványa, ami aláírta a végpontit.
+
+Gyökértanúsítvány (Root CA): A lánc legfelső foka. Ez egy önaláírt tanúsítvány.
+
+Trust Store: Az operációs rendszer vagy a böngésző tartalmaz egy listát a megbízható gyökértanúsítványokról. Ha a lánc vége egy ilyenben végződik, a szoftver elfogadja a tanúsítványt.
+
+🏗️ A tanúsítvány megszerzésének folyamata (CSR)
+Ha szeretnél egy hiteles tanúsítványt a kulcsodhoz, a folyamat a következő:
+
+Kulcspár generálása: Létrehozol egy privát és egy nyilvános kulcsot.
+
+CSR (Certificate Signing Request) készítése: Egy kérelem, ami tartalmazza a nyilvános kulcsodat és az adataidat.
+
+Fontos: A CSR-t aláírod a saját privát kulcsoddal (Proof of Possession), hogy bizonyítsd: a kulcs tényleg a tiéd.
+
+Küldés a CA-nak: A hitelesítő ellenőrzi az adataidat, majd aláírja a kérelmet.
+
+Kiadás: Megkapod a kész, aláírt tanúsítványt, amit már bárki számára közzétehetsz.
+
+🚫 Érvényesség és Visszavonás
+Egy tanúsítvány nem örök életű, és idő előtt is érvénytelenné válhat (pl. ellopták a privát kulcsot). Erre két módszer van:
+
+CRL (Certificate Revocation List): Egy "feketelista", amit a CA tesz közzé a visszavont tanúsítványok sorszámaival.
+
+OCSP (Online Certificate Status Protocol): Egy online lekérdezés, ahol a szoftver valós időben kérdez rá a CA szerverénél: "Ez a tanúsítvány még érvényes?".
+
+🛠️ OpenSSL parancsok tanúsítványokhoz
+
+Feladat					Parancs
+CSR készítése (új kulccsal)		openssl req -new -newkey rsa:2048 -nodes -keyout privát.key -out kérelem.csr
+Önaláírt tanúsítvány készítése		openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privát.key -out tanúsítvány.crt
+CSR tartalmának ellenőrzése		openssl req -text -noout -verify -in kérelem.csr
+Tanúsítvány adatainak megtekintése	openssl x509 -text -noout -in tanúsítvány.crt

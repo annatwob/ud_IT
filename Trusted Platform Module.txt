@@ -1,0 +1,55 @@
+🏗️ A TPM felépítése és működése
+
+A TPM nem csak egy tároló, hanem egy önálló kriptográfiai processzor, amely garantálja, hogy az adatok (pl. a BitLocker kulcsa) csak egy "egészséges", módosítatlan rendszeren legyenek elérhetőek.
+
+1. PCR (Platform Configuration Register)
+A TPM regiszterekben tárolja a rendszer állapotát.
+
+PCR-ek szerepe: Speciális tárolók, amelyek a boot folyamat egy-egy szeletét (firmware, bootloader, partíciós tábla) mérik le.
+
+Példák:
+
+PCR0: Az alaplapi firmware (BIOS/UEFI) épségét méri.
+
+PCR4: A Boot Loader (indítóprogram) adatait tárolja.
+
+2. A Hash-lánc (Extend művelet)
+A PCR regiszterekbe nem lehet csak úgy beleírni. Egy értéket csak "hozzáfűzni" lehet a meglévőhöz.
+
+Logika: $Új\_PCR = Hash(Régi\_PCR + Új\_mérés)$
+
+Miért jó? Mert így a boot folyamat minden egyes apró lépése beleépül a végső hash értékbe. Ha a lánc bármelyik szeme (pl. egy módosított bootloader) megváltozik, a végeredmény teljesen más lesz.
+
+Sealing és Unsealing (Pecsételés és Feloldás)
+Ez a folyamat köti össze a titkosított adatokat a gép állapotával.
+
+Sealing (Lepecsételés)
+Amikor elmented a titkosító kulcsot (pl. a BitLocker VMK-t) a TPM-be, megadod a Policy-t:
+
+"Csak akkor add ki ezt a kulcsot, ha a PCR0 és a PCR4 értéke pontosan ennyi (azaz a firmware és a bootloader gyári állapotú)."
+
+Ebben a pillanatban a kulcs Sealed (lepecsételt) állapotba kerül.
+
+Unsealing (Felnyitás)
+Amikor a gép elindul:
+
+A rendszer végrehajtja a boot folyamatot, a PCR regiszterek feltöltődnek az aktuális hash értékekkel.
+
+A BitLocker kéri a kulcsot a TPM-től.
+
+A TPM összehasonlítja a PCR-ek jelenlegi értékét a Sealing-kor rögzített elvárt értékekkel.
+
+Eredmény:
+
+Egyezik: A TPM kiadja a kulcsot (Unseal), a Windows elindul.
+
+Eltér: (Pl. vírustámadás érte a boot szektort vagy frissült a BIOS): A TPM megtagadja a kulcsot. A gép lezár, és csak a Helyreállítási kulccsal (Recovery Key) nyitható ki.
+
+🛠️ Összefoglaló táblázat a vizsgához
+
+Fogalom		Jelentése / Feladata
+PCR		Regiszter, amely a rendszer integritását reprezentáló hash értéket tárolja.
+Hash-lánc	Biztosítja, hogy a boot folyamat minden lépése mérve legyen, sorrendben.
+Policy		Azon feltételek összessége (PCR értékek), amiknek teljesülniük kell az adathozzáféréshez.
+Sealing		Adat (kulcs) elrejtése a TPM-ben, adott PCR értékekhez kötve.
+Unsealing	Az adat visszaadása, ha a PCR regiszterek tartalma megegyezik az elvárttal.

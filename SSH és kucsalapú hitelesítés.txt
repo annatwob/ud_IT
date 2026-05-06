@@ -1,0 +1,50 @@
+🔐 Aszimmetrikus kriptográfia alapjai
+Az eljárás két kulcsra épül, amelyek matematikai kapcsolatban állnak, de egyikből nem származtatható a másik.
+
+Publikus (nyilvános) kulcs: Bárkinek odaadható. Olyan, mint egy nyitott lakat, amit bárki rákattinthat egy dobozra.
+
+Privát (titkos) kulcs: Szigorúan őrizni kell (hozzáférési jogokkal és jelszóval védve). Ez a kulcs, ami nyitja a lakatot.
+
+Mire használjuk?
+Titkosítás: A címzett publikus kulcsával titkosítunk -> Csak ő tudja a privát kulcsával elolvasni.
+
+Digitális aláírás: A küldő a saját privát kulcsával "ír alá" (titkosítja az üzenet hash-ét) -> Bárki ellenőrizheti a küldő publikus kulcsával, hogy valóban tőle jött-e az üzenet és nem módosult-e.
+
+🤝 Az SSH kapcsolat felépülése
+A folyamat két fő szakaszból áll:
+
+1. Szerver azonosítása és titkos csatorna
+A szerver elküldi a publikus kulcsát a kliensnek.
+
+A kliens ellenőrzi: ha először jár itt, megkérdezi, megbízunk-e benne. Ha már voltunk itt, összeveti a kulcsot a ~/.ssh/known_hosts fájlban tárolttal.
+
+Kulcscsere (Key Exchange): Létrehoznak egy közös szimmetrikus munkamenet-kulcsot. Innentől minden adat ezen a gyors, titkosított csatornán megy.
+
+2. Felhasználó hitelesítése (Kulcsalapú)
+A jelszavas belépés helyett a biztonságosabb kulcsalapú módszert használjuk:
+
+A kliens generál egy kulcspárt.
+
+A kliens publikus kulcsát átmásoljuk a szerverre (a célfelhasználó ~/.ssh/authorized_keys fájljába).
+
+Bejelentkezéskor a szerver egy "kihívást" (challenge) küld, amit csak a kliens privát kulcsával lehet megválaszolni. Ha sikerül, a szerver beenged jelszó kérése nélkül.
+
+🛠️ Parancsgyűjtemény
+Parancs			Funkció
+ssh-keygen		Létrehozza a privát (id_rsa) és publikus (id_rsa.pub) kulcspárt.
+ssh-copy-id user@host	Átmásolja a publikus kulcsot a szerver authorized_keys fájljába.
+ssh user@host		Kapcsolódás a távoli géphez.
+scp fajl user@host:/ut/ Biztonságos másolás SSH-n keresztül.
+
+📁 Fontos fájlok helye
+Kliens oldalon (~/.ssh/):
+
+id_rsa: A te féltett privát kulcsod.
+
+id_rsa.pub: A publikus kulcsod (ezt másolod a szerverekre).
+
+known_hosts: Azon szerverek listája és kulcsaik, amikben már megbíztál.
+
+Szerver oldalon (~/.ssh/):
+
+authorized_keys: Azon kliensek publikus kulcsai, akik jelszó nélkül beléphetnek hozzád.

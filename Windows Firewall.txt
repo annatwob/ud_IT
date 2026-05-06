@@ -1,0 +1,41 @@
+🛡️ Windows Tűzfal Profilok
+A Windows nem engedi tetszőleges zónák létrehozását, helyette három előre definiált profil közül választ a hálózati kapcsolat típusa alapján:
+
+Domain (Tartományi): Akkor aktív, ha a számítógép egy vállalati tartományhoz (Active Directory) csatlakozik. Ez a legmegengedőbb profil, mivel feltételezi a biztonságos belső hálózatot.
+
+Private (Magán): Otthoni vagy irodai hálózatokhoz. Itt engedélyezett a hálózati felderítés (látszanak a nyomtatók, más gépek).
+
+Public (Nyilvános): Kávézók, repterek, bárki által elérhető hálózatok. Ez a legszigorúbb profil, alapértelmezésben tiltja a fájlmegosztást és a láthatóságot.
+
+⚖️ Szabályok és Prioritás (Döntési mechanizmus)
+A Windows tűzfal szabályai (Inbound/Outbound) egy meghatározott hierarchia szerint futnak le. Ha két szabály ütközik, a következő sorrend dönt:
+
+Kifejezett Tiltás (Explicit Block/Deny): Ez a legerősebb. Ha egy szabály azt mondja, hogy "Tiltott", akkor hiába van egy másik szabály, ami engedélyezné, a forgalom blokkolva lesz.
+
+Kifejezett Engedélyezés (Explicit Allow): Ha nincs tiltás, de van engedélyező szabály, a forgalom átmegy (ez felülbírálja az alapértelmezett blokkolást).
+
+Alapértelmezett viselkedés (Default Action): Ha semmilyen szabály nem illeszkedik a csomagra, akkor a profilban beállított alapértelmezés lép életbe (ami bejövő forgalomnál általában a tiltás).
+
+💡 Vizsga-tipp: A Windowsnál a "Deny beats Allow" (a tiltás győz az engedély felett) elv érvényesül, hasonlóan az NTFS jogosultságokhoz!
+
+🛠️ Gyorsbeállítások és Speciális funkciók
+A Windows tűzfal felülete két szinten kezelhető:
+
+Egyszerű felület: Ki/be kapcsolás, "Pánik gomb" (minden bejövő tiltása), és alkalmazások listából való engedélyezése.
+
+Advanced Security (Speciális biztonság): Itt már portszámok, IP-címek és protokollok alapján hozhatunk létre egyedi szabályokat.
+
+Naplózás (Logging): A szabályok nem csak szűrhetnek, hanem utasíthatják is a rendszert a csomag adatainak rögzítésére ( auditing céljából).
+
+🎓 Végső Összefoglaló a Teljes Tananyaghoz
+Most, hogy az összes anyagrész végére értünk, itt egy gyors "mentőöv" a vizsgához a két rendszer párhuzamairól:
+
+Funkció			Linux Megfelelő			Windows Megfelelő
+Lemez titkosítás	LUKS / cryptsetup		BitLocker
+Hardveres védelem	TPM (PCR, Seal/Unseal)		TPM (PCR, FVEK/VMK)
+Alapjogosultságok	r, w, x (User, Group, Other)	13 speciális jog (5 alapcsoport)
+Bővített jogok		ACL (getfacl, setfacl)		NTFS ACL (ACE bejegyzések)
+Központi házirend	SELinux (Context labels)	— (Csoportházirend / AppLocker)
+Tűzfal egység		Netfilter (nftables)		Windows Defender Firewall
+Tűzfal kezelő		firewalld (Zónák)		Firewall Profiles (Domain, Priv, Pub)
+Jelszókezelés		/etc/shadow / chage		SAM adatbázis / Jelszóházirend

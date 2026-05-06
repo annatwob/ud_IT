@@ -1,0 +1,57 @@
+Speciális jogosultság bitek (Special Bits)
+Az eddigi 9 bit (rwxrwxrwx) előtt van még egy 4. oktális jegy, ami a speciális funkciókért felel. Értékei binárisan: 4 (SetUID), 2 (SetGID), 1 (Sticky).
+
+1. SetUID (Set User ID) – Értéke: 4
+Futtatható állományokra tesszük.
+
+Működése: A program nem a futtató felhasználó, hanem a fájl tulajdonosának nevében fut.
+
+Miért jó? Így egy sima felhasználó is elvégezhet olyan feladatot, amihez amúgy nincs joga (pl. a passwd parancs módosítja az /etc/shadow-t, amihez csak a root férne hozzá).
+
+Veszély: Ha a program biztonsági hibás, a támadó a tulajdonos (gyakran a root) jogaival élhet vissza.
+
+Katalóguson: Hatástalan.
+
+2. SetGID (Set Group ID) – Értéke: 2
+Fájlon és katalóguson is van értelme.
+
+Fájlon: A program a fájl csoportjának jogaival fut.
+
+Katalóguson: Ez a "közös munka" bitje. Minden új fájl, ami ebbe a mappába kerül, örökli a mappa csoportját, nem pedig a létrehozó saját csoportját kapja meg.
+
+3. Sticky bit – Értéke: 1
+Ma már szinte csak katalógusokon használjuk (régen a memóriában tartást segítette).
+
+Katalóguson: A "törlésvédelmi" bit. Csak akkor törölhetsz egy fájlt a mappából, ha te vagy a fájl tulajdonosa, vagy te vagy a mappa tulajdonosa.
+
+Példa: A /tmp mappa. Bárki írhat bele, de nem törölhetik ki egymás fájljait a felhasználók.
+
+Megjelenítés és Jelölések
+
+A speciális biteket az execute (x) helyén jelezzük. Ha az alap x is be van állítva, kisbetűt látunk, ha nincs, akkor nagybetűt.
+
+Név	Helye	   Jelölés (ha van x)	Jelölés (ha nincs x)	Oktális érték
+SetUID	User (u)   s			S			4
+SetGID	Group (g)  s			S			2
+Sticky	Others (o) t			T			1
+
+Példa: rwsr-xr-t jelentése: SetUID bekapcsolva (s), Sticky bit bekapcsolva (t).
+
+Parancsok és az umask
+1. Speciális bitek beállítása
+SetUID: chmod 4755 fajl vagy chmod u+s fajl
+
+SetGID: chmod 2775 mappa vagy chmod g+s mappa
+
+Sticky: chmod 1777 mappa vagy chmod +t mappa
+
+2. umask (User Mask)
+Meghatározza, milyen jogokat tiltunk le alapértelmezésben új fájl létrehozásakor.
+
+Fájlok alapja: 666 (senki nem kap alapból futtatási jogot biztonsági okokból)
+
+Mappák alapja: 777
+
+Kiszámítás: Alap - umask = Létrejövő jog
+
+Példa: Ha az umask 022, akkor egy új fájl jogai: 666 - 022 = 644 (rw-r--r--).

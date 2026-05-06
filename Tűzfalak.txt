@@ -1,0 +1,52 @@
+Ez a fejezet a hálózati védelem első vonaláról, a tűzfalakról szól. Vizsga szempontjából a legfontosabb a működési elvek (statikus vs. dinamikus) és a felhasználási módok közötti különbségtétel.
+
+🧱 Mi a tűzfal feladata?
+A tűzfal egy "szűrő", amely a hálózati forgalmat figyeli, és egy előre meghatározott szabályrendszer alapján dönt: átengedi (Allow/Accept) vagy elutasítja (Drop/Reject) a csomagokat.
+
+1. Hardveres vs. Szoftveres tűzfal
+Szoftvertűzfal: Egy adott operációs rendszeren futó alkalmazás (pl. Windows Defender Firewall, Linux iptables/nftables). Elsősorban az adott gépet védi (host-based).
+
+Hardvertűzfal: Egy dedikált eszköz a hálózat határán (pl. egy routerbe építve vagy különálló eszköz). A mögötte lévő teljes hálózatot védi (network-based).
+
+Érdekesség: Egy PC is lehet hardvertűzfal, ha csak erre a célra használjuk (pl. OPNSense telepítésével), de ehhez sok hálózati kártya (NIC) és nagy megbízhatóság kell.
+
+🔍 Szűrési technológiák
+A tűzfalak "intelligenciája" alapján két fő kategóriát különítünk el:
+
+Statikus csomagszűrés (Static Packet Filtering)
+A legalapvetőbb módszer. Csak a csomag fejlécét (header) nézi, és nem érdekli a kapcsolat környezete.
+
+Mit vizsgál?
+
+Forrás és cél IP-cím.
+
+Forrás és cél portszám (pl. Port 80 a HTTP-hez).
+
+Protokoll típusa (TCP, UDP, ICMP).
+
+Hátránya: Nem tudja megkülönböztetni, hogy egy csomag egy kért válasz-e, vagy egy kéretlen támadás.
+
+Dinamikus csomagszűrés (Stateful Inspection)
+Ez a modernebb és biztonságosabb módszer. Figyeli a kapcsolatok állapotát (state).
+
+Hogyan működik? A tűzfal emlékszik a kimenő kérésekre. Ha te lekérsz egy weboldalt, a tűzfal megjegyzi ezt, és a válaszként érkező csomagokat automatikusan átengedi, mert tudja, hogy te kérted őket.
+
+Előnye: Csak akkor enged be forgalmat kívülről, ha az egy bentről indított kapcsolathoz tartozik, vagy ha kifejezetten engedélyezett (pl. webszerver esetén).
+
+💻 Host-based tűzfalak
+Ahogy az anyagod írja, ezek a saját gépünket védik.
+
+Hol fut? Közvetlenül az operációs rendszeren.
+
+Mire jó? Megvédi a laptopunkat akkor is, ha "ellenséges" hálózatra csatlakozunk (pl. nyilvános Wi-Fi a kávézóban).
+
+Működése: Szabályozhatjuk vele, hogy melyik telepített programunk kommunikálhat az internettel, és ki próbálhat meg kívülről csatlakozni hozzánk.
+
+🛠️ Parancsok és fogalmak (Vizsgához)
+Linuxon a tűzfal kezelése leggyakrabban ezekkel a parancsokkal történik (disztribúciótól függően):
+
+ufw (Uncomplicated Firewall): Ubuntu/Debian alatt a legegyszerűbb kezelőfelület (pl. ufw allow 22/tcp).
+
+firewalld / firewall-cmd: RedHat/CentOS/Fedora rendszereken használt zóna-alapú tűzfal.
+
+iptables / nftables: Az alacsony szintű rendszer, amire a fenti eszközök épülnek.

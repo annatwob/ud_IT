@@ -1,0 +1,55 @@
+📂 A három legfontosabb konfigurációs fájl
+1. /etc/passwd – Felhasználói alapadatok
+Ez a fájl mindenki számára olvasható, ezért nem tartalmazhat titkos adatot (jelszót).
+
+Szerkezete: név:jelszó_helye:UID:GID:megjegyzés:home:shell
+
+Fontos mezők:
+
+Jelszó helye: Régen itt volt a hash, ma már csak egy x karakter áll itt, ami azt jelzi, hogy a jelszó a shadow fájlban van.
+
+UID (User ID): A root azonosítója mindig 0.
+
+Shell: Ha /bin/false vagy /sbin/nologin, a felhasználó nem tud interaktívan belépni (technikai fiók).
+
+2. /etc/shadow – A jelszavak és lejáratok helye
+Ez a fájl csak a root számára olvasható. Itt tárolódnak a jelszavak sózott hash értékei és az időbeli korlátozások.
+
+Szerkezete: név:jelszó_hash:utolsó_váltás:min:max:figyelmeztetés:inaktivitás:lejárat:fenntartott
+
+3. /etc/group – Csoporttagságok
+Ebben a fájlban rögzítik a kiegészítő (supplementary) csoporttagságokat.
+
+Szerkezete: csoportnév:jelszó:GID:tagok_listája
+
+⏳ Jelszólejárati szabályok (A shadow fájl logikája)
+A vizsgán gyakran kérdeznek rá az időintervallumok jelentésére. Itt a legfontosabb tudnivalók:
+
+Mező		Jelentése						  Speciális értékek
+Max nap		Mennyi ideig érvényes a jelszó.				  0 vagy -1: soha nem jár le.
+Warning		Hány nappal a lejárat előtt kezdjen el szólni a rendszer. 0 / -1: nincs figyelmeztetés.
+Inactivity	Türelmi idő a lejárat után.				  0: a lejárat pillanatában azonnal kitilt.
+Expiration	A fiók (account) konkrét lejárati dátuma.		  Ha eléri, a belépés teljesen blokkolt.
+
+Inaktivitás vs. Lejárat:
+Lejárat (Max nap): A jelszó elévül, de a felhasználó még be tud lépni, hogy azonnal megváltoztassa.
+
+Inaktivitás: Ha a jelszó lejárt, és ez az idő is letelt, a felhasználó már saját maga nem tudja megjavítani a fiókját; rendszergazdai segítség kell.
+
+🛠️ Parancsgyűjtemény a kezeléshez
+1. id [felhasználó]
+Megmutatja az UID-t, az elsődleges GID-t és az összes csoportot, aminek a tagja.
+
+2. chage (Change Age)
+A legfontosabb parancs a jelszólejáratok beállítására és ellenőrzésére.
+
+chage -l felhasználó: Kilistázza a jelszó élettartam adatait (olvasható formában).
+
+chage -M 90 felhasználó: Beállítja a maximum 90 napos érvényességet.
+
+chage -E 2026-12-31 felhasználó: Beállítja a fiók lejárati dátumát.
+
+3. useradd / usermod
+useradd -m -s /bin/bash név: Új felhasználó létrehozása home mappával és bash shellel.
+
+usermod -aG csoport név: Felhasználó hozzáadása egy kiegészítő csoporthoz (-a = append, -G = Groups).

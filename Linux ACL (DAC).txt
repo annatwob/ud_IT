@@ -1,0 +1,51 @@
+Mi az az ACL? (Access Control List)
+Míg a hagyományos modellben csak egy tulajdonost és egy csoportot adhattunk meg, az ACL lehetővé teszi, hogy tetszőleges számú nevesített felhasználóhoz (pl. "kovacs_p") vagy csoporthoz rendeljünk egyedi jogokat.
+
+Honnan látod, hogy van ACL?
+Az ls -l kimenetében a jogosultságok végén egy plusz jel (+) vagy egy pont (.) jelenik meg (pl. -rwxr-xr-x+). A plusz jel jelzi az aktív ACL-t.
+
+Az ACL bejegyzések típusai
+ACL_USER_OBJ: A fájl eredeti tulajdonosának joga (a sima u).
+
+ACL_USER: Egy konkrét, nevesített felhasználó joga (pl. user:anna:rwx).
+
+ACL_GROUP_OBJ: Az eredeti tulajdonos csoport joga (a sima g).
+
+ACL_GROUP: Egy konkrét, nevesített csoport joga (pl. group:marketing:r--).
+
+ACL_MASK: A legfontosabb biztonsági korlát. Meghatározza a maximális kiadható jogot a nevesített userek és minden csoport számára.
+
+ACL_OTHER: Mindenki más joga (a sima o).
+
+⚡ A Hozzáférési Algoritmus (Hogyan dönt a Linux?)
+A rendszer sorrendben halad, és az első illeszkedésnél megáll. A jogok soha nem adódnak össze!
+
+Tulajdonos-e? Ha igen, az ACL_USER_OBJ dönt. Kész.
+
+Nevesített felhasználó-e? Ha szerepel a neve egy ACL_USER bejegyzésben, akkor az ottani jogok érvényesek, de csak annyi, amennyit az ACL_MASK is enged.
+
+Csoporttag-e? Ha a saját csoportja vagy bármelyik kiegészítő csoportja (supplementary groups) egyezik az ACL_GROUP_OBJ-vel vagy bármelyik ACL_GROUP-pal:
+
+Itt az összes illeszkedő csoport jogát nézi, és ha bármelyikben megvan a kért jog (és a MASK is engedi), akkor mehet a művelet.
+
+Mindenki más: Ha egyik fenti sem, az ACL_OTHER dönt.
+
+⚠️ Vizsga-csapda: Ha a tulajdonosnak nincs joga, de az "Other"-nek van, a tulajdonos nem fogja tudni megnyitni a fájlt, mert az 1. lépésnél elbukott!
+
+🛠️ ACL Parancsok
+getfacl fájlnév: Kilistázza a fájl összes ACL bejegyzését.
+
+setfacl -m u:felhasznalo:rwx fájlnév: Jogosultság hozzáadása/módosítása (-m = modify).
+
+setfacl -x u:felhasznalo fájlnév: Egy adott bejegyzés törlése.
+
+setfacl -b fájlnév: Az összes extra ACL törlése (visszaáll az alapmodell).
+
+Fájlrendszer szintű korlátozások (Mount opciók)
+
+Nem minden a jogosultságokon múlik; a fájlrendszer csatolásakor (mount) globális tiltásokat vezethetünk be:
+
+Opció		Jelentése		Biztonsági haszna
+ro		Read-Only		A lemez nem írható, hiába van bárkinek w joga.
+noexec		No Execution		Megakadályozza programok futtatását (pl. /home mappán hasznos).
+nosuid		No SetUID		A korábban tanult SetUID/SetGID biteket figyelmen kívül hagyja.

@@ -1,0 +1,87 @@
+Linux alapú jogosultságok és fájlrendszer
+ls -l: Kilistázza a fájlok jogosultságait (rwx), tulajdonosát és csoportját.
+
+chmod: Módosítja a jogosultságokat. Használható számokkal (pl. 755) vagy betűkkel (pl. u+x).
+
+chown: Megváltoztatja a fájl tulajdonosát és/ou csoportját (pl. chown root:root fajl).
+
+id: Megmutatja az aktuális felhasználó UID-jét, elsődleges és kiegészítő csoportjait.
+
+ln: Linkek létrehozása. Sima ln a hard linkhez, ln -s a szimbolikus (soft) linkhez.
+
+umask: Beállítja vagy megmutatja az új fájlok létrehozásakor alkalmazott tiltó maszkot.
+
+Haladó jogosultságkezelés (ACL és SELinux)
+getfacl: Megjeleníti a fájl részletes hozzáférési listáját (ACL).
+
+setfacl -m: Új ACL szabályt ad hozzá vagy módosít egy létezőt (pl. u:anna:rw-).
+
+setfacl -x: Töröl egy adott ACL bejegyzést.
+
+ls -Z: Megmutatja a fájlok SELinux kontextus címkéit.
+
+ps -Z: Megmutatja a futó folyamatok SELinux kontextusát.
+
+chcon: Átmenetileg megváltoztatja egy fájl SELinux típusát.
+
+restorecon: Visszaállítja a fájl SELinux címkéjét az alapértelmezett (file_context) értékre.
+
+getenforce / setenforce: Lekérdezi vagy beállítja a SELinux módját (Enforcing/Permissive).
+
+Lemez- és fájltitkosítás
+cryptsetup luksFormat: LUKS partíció létrehozása (mindent töröl az adott lemezen!).
+
+cryptsetup open: Felnyit egy titkosított kötetet és nevet rendel hozzá a /dev/mapper alatt.
+
+cryptsetup close: Lezárja a korábban felnyitott titkosított kötetet.
+
+openssl enc: Szimmetrikus titkosítás (AES). A -d kapcsolóval fejt vissza, a -salt kapcsolóval ad hozzá sót.
+
+openssl genrsa: RSA privát kulcs generálása.
+
+openssl rsa: Publikus kulcs kinyerése a privát kulcsból.
+
+openssl rsautl: RSA alapú aszimmetrikus titkosítás és visszafejtés.
+
+Felhasználó- és jelszókezelés
+useradd: Új felhasználó létrehozása.
+
+usermod: Meglévő felhasználó adatainak (pl. csoporttagság) módosítása.
+
+chage -l: Kilistázza a felhasználó jelszólejárati adatait a shadow fájlból.
+
+chage -M: Beállítja a jelszó maximális élettartamát napokban.
+
+SSH és hálózati kapcsolatok
+ssh-keygen: Létrehozza az RSA kulcspárt (id_rsa és id_rsa.pub).
+
+ssh-copy-id: Átmásolja a publikus kulcsot a távoli szerver authorized_keys fájljába.
+
+ssh: Bejelentkezés távoli gépre titkosított csatornán.
+
+scp: Fájlok biztonságos másolása távoli gépre vagy gépről.
+
+Tűzfal kezelés (Linux)
+firewall-cmd --list-all: Megmutatja az aktuális zóna összes tűzfalszabályát.
+
+firewall-cmd --add-service: Szolgáltatás (pl. http, ssh) ideiglenes engedélyezése.
+
+firewall-cmd --add-port: Konkrét port (pl. 8080/tcp) megnyitása.
+
+firewall-cmd --reload: A permanens (mentett) szabályok aktiválása.
+
+firewall-cmd --panic-on: Minden hálózati forgalom azonnali blokkolása.
+
+nft list ruleset: Az alacsony szintű Netfilter szabályok listázása.
+
+Tanúsítványok (OpenSSL)
+openssl req -new: Új tanúsítvány aláírási kérelem (CSR) készítése.
+
+openssl x509: Tanúsítványok kezelése, megtekintése vagy önaláírt tanúsítvány generálása.
+
+Windows (Futtatható parancsok / MMC modulok)
+gpedit.msc: Csoportszabályszerkesztő (itt kapcsoljuk be az Auditálást).
+
+eventvwr.msc: Eseménynapló (itt nézzük meg a Security naplót az audit naplózáshoz).
+
+control / BitLocker: BitLocker kezelőfelülete a Vezérlőpultban.

@@ -1,0 +1,48 @@
+Az RSA (Rivest-Shamir-Adleman) az aszimmetrikus kriptográfia alapköve. Míg az AES-nél egy közös kulcsot használtunk, itt két, matematikailag összefüggő, de különböző kulcsunk van.
+
+Ez a téma két fő funkcióra oszlik: Titkosítás (hogy ne lássák) és Aláírás (hogy tudják, tőled jött).
+
+🔑 A kulcspár szerepe
+A kulcspár két részből áll:
+
+Privát kulcs (Private Key): Szigorúan titkos, csak a tulajdonosnál van. Ezzel generáljuk a publikus párját is.
+
+Publikus kulcs (Public Key): Bárki számára elérhető, szétküldhető.
+
+📡 1. Üzenetküldés (Titkosítás)
+Ha titkos üzenetet akarsz küldeni, a CÍMZETT kulcsait használod.
+
+Küldés: Az üzenetet a címzett nyilvános kulcsával titkosítod.
+
+Visszafejtés: Csak a címzett privát kulcsa tudja kinyitni a "lakatot".
+
+Biztonság: Mivel a privát kulcsot senki más nem ismeri, még ha el is kapják az üzenetet, nem tudják elolvasni.
+
+✍️ 2. Digitális aláírás (Hitelesítés)
+Itt a kulcsok szerepe felcserélődik. Itt a KÜLDŐ kulcsait használjuk.
+
+Aláírás: A küldő készít egy kivonatot (hash) az üzenetből, és ezt titkosítja a saját privát kulcsával. Ez lesz az aláírás.
+
+Ellenőrzés: A címzett megkapja az üzenetet és az aláírást. A küldő nyilvános kulcsával visszafejti az aláírást (megkapja az eredeti hash-t).
+
+Összevetés: Ha az üzenetből frissen számolt hash megegyezik a visszafejtett hash-sel:
+
+Az üzenet nem módosult (Integritás).
+
+Biztosan a privát kulcs tulajdonosa küldte (Hitelesség).
+
+🛠️ OpenSSL parancsok az RSA-hoz
+
+Feladat				Parancs
+Privát kulcs generálása		openssl genrsa -out privát.pem 2048
+Publikus kulcs kinyerése	openssl rsa -in privát.pem -pubout -out publikus.pem
+Titkosítás (pub. kulccsal)	openssl rsautl -encrypt -pubin -inkey publikus.pem -in adat.txt -out adat.enc
+Visszafejtés (priv. kulccsal)	openssl rsautl -decrypt -inkey privát.pem -in adat.enc -out adat.txt
+
+⚖️ Összehasonlítás: AES vs. RSA (Vizsgára!)
+
+Jellemző	AES (Szimmetrikus)			RSA (Aszimmetrikus)
+Kulcsok száma	1 (közös)				2 (privát + publikus)
+Sebesség	Nagyon gyors				Lassú (számításigényes)
+Használat	Nagy fájlok titkosítása			Kulcscsere, digitális aláírás
+Kulcsmegosztás	Nehéz (biztonságosan kell átadni)	Könnyű (a publikus kulcs mehet bárhova)

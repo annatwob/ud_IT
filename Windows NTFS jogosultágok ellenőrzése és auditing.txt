@@ -1,0 +1,53 @@
+Effective Access (Tényleges hozzáférés)
+Mivel az NTFS-ben az explicit, örökölt, engedélyezett és tiltott jogok kombinációja átláthatatlan lehet, a Windows kínál egy szimulátort.
+
+Mire jó? Megmutatja, hogy egy adott felhasználónak (vagy csoportnak) valójában milyen joga marad, miután a rendszer lefuttatta a döntési algoritmust.
+
+Működése: Nem kell bejelentkezned a felhasználó nevében a teszteléshez. Csak kiválasztod a nevét az eszközben, és az kipipálja a 13 alapjog közül azokat, amikkel ténylegesen rendelkezik.
+
+Hol találod? Fájl tulajdonságai > Security fül > Advanced gomb > Effective Access fül.
+
+📝 Auditing (Objektumhozzáférés-naplózás)
+Az auditing nem korlátozza a hozzáférést, hanem naplózza, hogy ki, mikor és mit próbált tenni egy fájllal. Ez elengedhetetlen az incidensek kivizsgálásához.
+
+A beállítás kétlépcsős folyamata (Kritikus!)
+Ahhoz, hogy a naplózás működjön, mindkét helyen be kell állítani:
+
+Rendszerszintű engedélyezés (A "főkapcsoló"):
+
+Az operációs rendszernek meg kell mondani, hogy egyáltalán figyelje a fájlrendszer eseményeit.
+
+Útvonal: gpedit.msc (Csoportházirend) > Számítógép konfigurációja > Windows beállítások > Biztonsági beállítások > Speciális auditálási szabályok > Object Access > Audit File System.
+
+Objektumszintű szabályozás (A "mit figyeljünk"):
+
+Itt adjuk meg, hogy melyik konkrét fájlt vagy mappát figyeljük.
+
+Beállítás: Fájl tulajdonságai > Security > Advanced > Auditing.
+
+Itt kiválasztható, hogy a sikeres (Success), a sikertelen (Fail), vagy mindkét típusú próbálkozást rögzítse-e a rendszer.
+
+🕵️ Event Viewer (Eseménynapló)
+Ha a naplózás aktív, az eseményeket az Event Viewerben lehet visszakeresni.
+
+Futtatás: eventvwr.msc
+
+Helye: Windows Logs > Security
+
+Mit látsz itt?
+
+Ki (User)
+
+Melyik fájlhoz (Object)
+
+Milyen művelettel (Access: pl. Write, Delete) próbálkozott.
+
+Sikerült-e neki (Success/Failure).
+
+Összefoglaló parancsok és eszközök (Windows vs Linux)
+
+Feladat			Windows eszköz			Linux parancs/eszköz
+Jogosultság módosítás	Properties / GUI		chmod, setfacl
+Tulajdonos módosítás	Properties / GUI		chown
+Jogok ellenőrzése	Effective Access fül		getfacl
+Naplózás / Audit	Event Viewer (eventvwr.msc)	auditd (Linux audit daemon)

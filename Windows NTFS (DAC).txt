@@ -1,0 +1,62 @@
+🏗️ Az NTFS jogosultságok felépítése
+Míg Linuxon 3 alapjog van, Windows NTFS-en 13 speciális jogosultság létezik. Mivel ezeket nehéz fejben tartani, a rendszer 5 jól elkülöníthető csoportba (Standard Permissions) gyűjti őket:
+
+Az 5 alapvető jogosultsági csoport
+Read (Olvasás): Fájlok megnyitása, attribútumok megtekintése.
+
+Read & Execute (Olvasás és végrehajtás): Ugyanaz, mint a Read, plusz programok futtatása és mappákban való navigálás.
+
+Write (Írás): Új fájlok/mappák létrehozása, meglévők módosítása.
+
+Modify (Módosítás): Olvasás + Írás + Törlés.
+
+Full Control (Teljes hozzáférés): Minden jog, beleértve a jogosultságok módosítását és a tulajdonba vételt.
+
+⚖️ A döntési algoritmus (Prioritási sorrend)
+Ez a rész a vizsgák kedvence. Windows alatt a rendszer egy meghatározott sorrendben nézi végig az ACL bejegyzéseket (ACE), és ahol először talál egyezést, ott megáll.
+
+A döntési sorrend:
+
+Explicit Deny (Kifejezett tiltás): Ha közvetlenül a fájlon tiltva van valami -> KASZA, nincs tovább.
+
+Explicit Allow (Kifejezett engedély): Ha közvetlenül a fájlon engedélyezve van -> MEHET.
+
+Inherited Deny (Örökölt tiltás): A szülőmappától örökölt tiltás -> KASZA.
+
+Inherited Allow (Örökölt engedély): A szülőmappától örökölt engedély -> MEHET.
+
+Implicit Deny: Ha semmi nem illeszkedik -> KASZA (alapértelmezett elutasítás).
+
+💡 Fontos különbség a Linuxhoz képest:
+
+Windowsnál a Deny (tiltás) erősebb, mint az Allow (engedély).
+
+Az Explicit jog erősebb, mint az örökölt.
+
+A felhasználói jog NEM élvez prioritást a csoportjog felett (ellentétben a Linuxszal!). Ha a felhasználómnak van "Allow" joga, de a csoportomnak "Deny", akkor a Deny győz (ha mindkettő ugyanolyan szintű, pl. explicit).
+
+🔑 Tulajdonjog és Speciális szabályok
+Take Ownership (Tulajdonba vétel)
+A fájl tulajdonosa (Owner) mindig módosíthatja a jogokat.
+
+Az Administrators csoport tagjai akkor is átvehetik a tulajdonjogot, ha ki vannak zárva az ACL-ből.
+
+Traverse Folder vs. Bypass Traverse Checking
+Alapesetben ahhoz, hogy elérj egy mélyen lévő fájlt, minden szülőmappán kellene lennie "Traverse" (Áthaladás) jogodnak.
+
+Azonban: A legtöbb felhasználónál be van kapcsolva a Bypass Traverse Checking, így nem kell minden mappához jog, ha tudják a pontos elérési utat a célfájlhoz.
+
+Törlési logika
+A törléshez két út vezet:
+
+Vagy magán a fájlon van Delete jogod.
+
+Vagy a tartalmazó mappán van Delete Subfolders and Files jogod.
+
+Összehasonlító táblázat (Linux vs. Windows)
+
+Jellemző		Linux (ACL)			Windows (NTFS)
+Alapjogok száma		3 (r, w, x)			13 (finomhangolható)
+Tiltás (Deny)		Nincs külön (csak a jog hiánya)	Van explicit Deny, és ez a legerősebb
+Öröklődés		Csak a Default ACL-en keresztül	Automatikus és kikapcsolható
+Prioritás		User > Group > Other		Explicit > Inherited (és Deny > Allow)

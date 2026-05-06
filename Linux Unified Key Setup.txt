@@ -1,0 +1,50 @@
+🔐 Mi az a LUKS? (Linux Unified Key Setup)
+A LUKS a Linux szabványos lemeztitkosítási formátuma. Nem egyes fájlokat, hanem egy egész partíciót vagy blokkeszközt titkosít.
+
+A LUKS felépítése és a kulcskezelés
+A rendszer egyik legnagyobb előnye a többszintű kulcskezelés:
+
+Mesterkulcs (Master Key): Ezzel az AES algoritmussal kódolt kulccsal vannak titkosítva a tényleges adatok a lemezen.
+
+Key Slots (Kulcshelyek): A mesterkulcsot nem közvetlenül tárolják, hanem titkosítva. A LUKS több (általában 8 vagy több) "foglalatot" tartalmaz.
+
+Felhasználói jelszó/kulcsfájl: Te a saját jelszavadat adod meg, ami feloldja az egyik Key Slot-ot, amiből előkerül a Mesterkulcs, ami végül olvashatóvá teszi az adatokat.
+
+Miért jó ez?
+
+Több jelszó: Több felhasználó is hozzáférhet ugyanahhoz a titkosított kötethez saját, egyedi jelszóval.
+
+Jelszócsere: Bármikor megváltoztathatod a jelszavadat anélkül, hogy a teljes lemezt (több terabájtot) újra kellene titkosítani.
+
+Visszavonás: Ha egy jelszó kompromittálódik, csak azt a Key Slot-ot kell törölni.
+
+🛠️ Konfiguráció és Eszközök
+1. cryptsetup
+Ez az elsődleges parancssori eszköz a LUKS kötetek kezelésére.
+
+Formázás: cryptsetup luksFormat /dev/sdb1 (Minden adat elvész, létrejön a titkosított kötet).
+
+Felnyitás: cryptsetup open /dev/sdb1 titkos_adatok (Létrehoz egy virtuális eszközt a /dev/mapper/titkos_adatok útvonalon).
+
+Lezárás: cryptsetup close titkos_adatok.
+
+2. Automatikus feloldás: /etc/crypttab
+Ahogy a fájlrendszereket az /etc/fstab csatolja, a titkosított köteteket a /etc/crypttab konfigurációs fájl kezeli indításkor.
+
+Itt adható meg, hogy melyik partíciót milyen névvel nyissa fel, és hol található hozzá a jelszó (kulcsfájl) vagy kérjen-e interaktív jelszót.
+
+3. Loop Device (Hurok eszköz)
+A szöveg említi demonstrációra. Ez lehetővé teszi, hogy egy sima fájlt úgy kezeljünk, mintha egy merevlemez lenne.
+
+Példa: Létrehozunk egy 1GB-os fájlt, losetup segítségével eszközt csinálunk belőle, majd ezen a virtuális lemezen gyakorolhatjuk a LUKS titkosítást anélkül, hogy valódi partíciókat bántanánk.
+
+🛡️ Stratégiai szempontok (Vizsgára)
+Mit titkosítsunk?
+
+/home: Kötelező, itt vannak a felhasználói adatok.
+
+/ (Root): Érdemes, mert a konfigurációs fájlok is tartalmazhatnak titkokat.
+
+Swap: Szintén fontos, mert a RAM tartalma (akár jelszavak is) kiíródhat ide titkosítatlanul!
+
+2FA-szerű megoldás: A leírás említi a pendrive-os megoldást. Ha a jelszó/kulcsfájl egy külső eszközön van, a gép csak akkor indul el, ha az fizikailag is jelen van.

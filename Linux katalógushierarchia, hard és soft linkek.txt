@@ -1,0 +1,51 @@
+1. ln (Link létrehozása)
+Hard link: ln cel_fajl uj_nev
+
+Soft link: ln -s cel_fajl uj_nev (A -s jelöli a Symbolic linket)
+
+2. ls -l (Ellenőrzés)
+A lista kimenetében két helyen látszik a linkelés:
+
+Hard linknél: A jogosultságok utáni szám jelzi a hivatkozások számát (ha >1, akkor van hard link).
+
+Soft linknél: A sor elején l betű áll (lrwxrwxrwx), és a név végén látszik a mutató: link_neve -> /utvonal/cel_fajl.
+
+A legfontosabb különbség, hogy mi történik a "háttérben": a Hard link az adathoz (inode) kapcsolódik, a Soft link pedig csak egy névhez.
+
+1. Hard link
+Olyan, mintha egy fájlnak két egyenértékű neve lenne.
+
+Azonos Inode: Mindkét név ugyanarra az adatblokkra mutat a lemezen.
+
+Jogosultságok: Mivel az inode azonos, a jogosultságok is közösek. Ha az egyik néven átírod a jogot (chmod), a másikon is megváltozik.
+
+Törlés: A fájl csak akkor törlődik ténylegesen, ha az összes hard linket letörölték (a link-számláló 0-ra csökken).
+
+Korlátok:
+
+Csak fájlokon működik (katalógusokon nem!).
+
+Csak ugyanazon a fájlrendszeren (partíción) belül hozható létre.
+
+2. Soft (Symbolic) link
+Olyan, mint a Windows-os "parancsikon". Egy külön fájl, aminek a tartalma egy útvonal.
+
+Saját Inode: Van saját azonosítója és saját jogosultságai (de ezek nem számítanak a hozzáférésnél).
+
+Jogosultságok: Mindig a célfájl jogosultságai döntenek.
+
+Broken link: Ha a célfájlt letöröljük, a soft link megmarad, de "eltörik" (már nem mutat sehova).
+
+Előnyök:
+
+Működik katalógusokra is.
+
+Működik különböző fájlrendszereken/meghajtókon keresztül is.
+
+Minden könyvtár tartalmaz két rejtett bejegyzést, amik gyakorlatilag hard linkek:
+
+. (pont): Önhivatkozás. Arra a könyvtárra mutat, amiben éppen vagyunk.
+
+.. (dupla pont): Szülő könyvtár. A hierarchiában felette lévő könyvtárra mutat.
+
+Kivétel: A gyökér könyvtárban (/) a .. is önmagára mutat, mert nincs felette semmi.

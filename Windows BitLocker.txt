@@ -1,0 +1,39 @@
+A Windows világában a lemeztitkosítás szabványa a BitLocker. Működési elve hasonló a Linuxos LUKS-hoz (többrétegű kulcskezelés), de szorosabban integrálódik a hardverbe, különösen a TPM chipen keresztül.
+
+🔐 A BitLocker kulcshierarchiája
+A BitLocker is "kulcsokat titkosító kulcsokat" használ, hogy rugalmas legyen a feloldás:
+
+FVEK (Full Volume Encryption Key): Ezzel a szimmetrikus kulccsal vannak titkosítva a lemezen lévő adatok.
+
+VMK (Volume Master Key): Ez a kulcs védi (titkosítja) az FVEK-et.
+
+Protector (Kulcsvédő): A VMK feloldásához szükséges módszer. Ez lehet:
+
+TPM: A hardverbe épített biztonsági chip.
+
+Jelszó / PIN kód.
+
+Recovery Key (Helyreállítási kulcs): Egy 48 jegyű számsor.
+
+🛡️ A TPM (Trusted Platform Module) szerepe
+A TPM egy speciális mikrokontroller az alaplapon, amely a kriptográfiai kulcsokat őrzi.
+
+Integritás-ellenőrzés: A TPM figyeli a rendszer állapotát (BIOS/UEFI beállítások, boot szektor). Ha a támadó megváltoztatja a hardvert vagy a boot folyamatot, a TPM "lezár", és nem adja ki a kulcsot.
+
+Hordozhatóság elleni védelem: Ha valaki kiszereli a merevlemezt és egy másik gépbe teszi, az adatok olvashatatlanok maradnak, mert a titkosítást feloldó kulcs az eredeti gép TPM chipjében maradt.
+
+🚑 Helyreállítási Kulcs (Recovery Key)
+A vizsga szempontjából kritikus megérteni, miért kötelező a helyreállítási kulcs generálása:
+
+Hardverhiba/Változás: Ha kicseréled az alaplapot vagy frissíted a BIOS-t, a TPM azt hiheti, hogy támadás történik, és megtagadja a VMK feloldását.
+
+Elfelejtett jelszó: Ez az utolsó mentőöv. A helyreállítási kulcs közvetlenül képes visszafejteni a VMK-t, megkerülve a TPM-et vagy a jelszót.
+
+🛠️ LUKS vs. BitLocker – Összehasonlítás a vizsgához
+
+Jellemző		  Linux (LUKS)			Windows (BitLocker)
+Adatokat titkosító kulcs  Master Key			FVEK (Full Volume Encryption Key)
+Kulcsvédő réteg		  Key Slots (8 db)		VMK (Volume Master Key)
+Hardveres támogatás	  Opcionális (TPM használható)	Erősen TPM-központú
+Konfiguráció		  cryptsetup, /etc/crypttab	Control Panel / manage-bde parancs
+Automatikus feloldás	  Kulcsfájl vagy jelszó bootkor TPM (észrevétlen feloldás bootkor)
